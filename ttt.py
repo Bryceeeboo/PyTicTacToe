@@ -90,8 +90,38 @@ def scoreForState(c):
     else:  # Game is not over
         return None  # No score, because game is continuing
 
+
+def boardIsValid(c):
+    """
+    Is the board a valid configuration?
+    The number of occurrences of Xs and Os must not differ by more than 1
+    """
+    return abs(c.count(1) - c.count(-1)) <= 1
+
+
+def generateValidNextState(c):
+    """
+    Given a configuration, generates all valid next configurations of the board
+        Input: Board configuration -> List of integers
+        Output: List of Board configurations -> List of List of Integers
+    """
+
+    validNextStates = []
+    for i, e in enumerate(c):  # Clone c
+        if e == 0:
+            d = list(c)
+            d[i] = 1  # Replace the empty space
+            validNextStates.append(d)  # Add it to the list of valid configs
+    return validNextStates
+
+
 # Test cases
 print gameIsFinished([0,0,0,0,0,0,0,0,0])
 print gameIsFinished([1,0,-1,0,-1,1,-1,1,0])
 print scoreForState([0,0,0,0,0,0,0,0,0])
 print scoreForState([1,0,-1,0,-1,1,-1,1,0])
+print boardIsValid([0,0,0,0,0,0,0,0,0])
+print boardIsValid([1,0,-1,0,-1,1,-1,1,0])
+x = generateValidNextState([1,0,-1,0,-1,1,-1,1,0])
+for config in x:
+    drawBoard(config)
