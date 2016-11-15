@@ -1,5 +1,7 @@
+import random
+import time
 # symbolDict will be set based on whether the player chooses X or O
-symbolDict = {0: " ", 1: "X", -1: "O"}
+symbolDict = {}
 
 
 def drawBoard(c):
@@ -13,13 +15,14 @@ def drawBoard(c):
         Output:
             void. Prints board to the console
     """
-
+    print ""
     print "-------------"  # Top Border
     for i in range(3):  # for each row
         n = i*3
         print "| {} | {} | {} |".format(
             symbolDict[c[n]], symbolDict[c[n+1]], symbolDict[c[n+2]])
         print "-------------"
+    print ""
 
 
 def gameIsFinished(c):
@@ -32,7 +35,6 @@ def gameIsFinished(c):
             1st element -> Is the agent the winner, T/F, or None if draw
     """
 
-    drawBoard(c)
     # Check rows and columns
     for i in range(3):
 
@@ -66,7 +68,7 @@ def gameIsFinished(c):
             return (True, False)  # Game is over, player wins
 
     # Check for a draw - i.e., all spces occupied
-    if abs(sum(c)) == 9:  # then every space is occupied
+    if sum([abs(i) for i in c]) == 9:  # then every space is occupied
         return (True, None)
 
     return (False, False)  # Game is not finished
@@ -107,21 +109,98 @@ def generateValidNextState(c):
     """
 
     validNextStates = []
-    for i, e in enumerate(c):  # Clone c
+    for i, e in enumerate(c):
         if e == 0:
-            d = list(c)
+            d = list(c)  # clone c
             d[i] = 1  # Replace the empty space
             validNextStates.append(d)  # Add it to the list of valid configs
     return validNextStates
 
 
+def getValidMovesFor(c):
+    """
+    Given a configuration, returns all valid next moves.
+        Input: Board configuration -> List of integers
+        Output: List of valid positions to place a piece
+    """
+
+    validNextMoves = []
+    for i, e in enumerate(c):
+        if e == 0:
+            validNextMoves.append(i+1)
+    return validNextMoves
+
+"""MAIN LOOP"""
+print "Tic Tac Toe\n"
+
+# Get an input from the player
+valid = False
+while not valid:
+    playerChar = raw_input("Play X or O? ")  # Ask user to pick play
+    if not playerChar.upper() in ["X", "O"]:
+        print "Input is invalid, please pick X or O"
+    else:
+        playerChar = playerChar.upper()  # Convert to upper
+        if playerChar == "X":  # Player wants to play X
+            symbolDict = {0: " ", 1: "X", -1: "O"}
+        elif playerChar == "O":  # Player wants to play O
+            symbolDict = {0: " ", 1: "O", -1: "X"}
+        valid = True
+print "You have chosen to play", playerChar, "\n"
+
+# Pick who goes first
+print "Picking who goes first..."
+if round(random.random()) > 0:
+    print "Agent goes first"
+    agentsMove = True
+else:
+    print "You go first"
+    agentsMove = False
+
+# Play the game
+gameBoard = [0, 0, 0, 0, 0, 0, 0, 0, 0]
+while not gameIsFinished(gameBoard)[0]:
+
+    if agentsMove:  # Agent's move
+        # The agent's move
+        print "Agent Moving"
+        # PALCEHOLDER - PICK A RANDOM MOVE
+        gameBoard[random.choice(getValidMovesFor(gameBoard))-1] = 1
+        agentsMove = not agentsMove  # Alternate move
+
+    else:  # Player's move
+        validPlayerMoves = getValidMovesFor(gameBoard)
+        print "Your Move. Valid moves are", validPlayerMoves
+        # Get a valid move from the player
+        enteredValidMove = False
+        while not enteredValidMove:
+            position = input("Move? ")
+            if not position in validPlayerMoves:
+                print "Invalid move entered."
+            else:
+                enteredValidMove = True
+        gameBoard[position - 1] = -1  # Make the move for the player
+        agentsMove = not agentsMove  # Alternate move
+
+    drawBoard(gameBoard)  # Draw the board after every move
+
+# Game is over, evalute the result
+gameStatus = gameIsFinished(gameBoard)
+if gameStatus[1]:  # Agent wins
+    print "Agent wins"
+elif gameStatus[1] is False:  # Player wins
+    print "You Win"
+else:  # None... Draw
+    print "DRAW"
+
 # Test cases
-print gameIsFinished([0,0,0,0,0,0,0,0,0])
-print gameIsFinished([1,0,-1,0,-1,1,-1,1,0])
-print scoreForState([0,0,0,0,0,0,0,0,0])
-print scoreForState([1,0,-1,0,-1,1,-1,1,0])
-print boardIsValid([0,0,0,0,0,0,0,0,0])
-print boardIsValid([1,0,-1,0,-1,1,-1,1,0])
-x = generateValidNextState([1,0,-1,0,-1,1,-1,1,0])
-for config in x:
-    drawBoard(config)
+# print gameIsFinished([0,0,0,0,0,0,0,0,0])
+# print gameIsFinished([1,0,-1,0,-1,1,-1,1,0])
+# print scoreForState([0,0,0,0,0,0,0,0,0])
+# print scoreForState([1,0,-1,0,-1,1,-1,1,0])
+# print boardIsValid([0,0,0,0,0,0,0,0,0])
+# print boardIsValid([1,0,-1,0,-1,1,-1,1,0])
+# print boardIsValid([1,1,1,1,1,1,1,1,1])
+# x = generateValidNextState([1,0,-1,0,-1,1,-1,1,0])
+# for config in x:
+#     drawBoard(config)
