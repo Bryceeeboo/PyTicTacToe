@@ -15,6 +15,7 @@ def drawBoard(c):
         Output:
             void. Prints board to the console
     """
+
     print ""
     print "-------------"  # Top Border
     for i in range(3):  # for each row
@@ -98,6 +99,7 @@ def boardIsValid(c):
     Is the board a valid configuration?
     The number of occurrences of Xs and Os must not differ by more than 1
     """
+
     return abs(c.count(1) - c.count(-1)) <= 1
 
 
@@ -130,6 +132,7 @@ def getValidMovesFor(c):
             validNextMoves.append(i+1)
     return validNextMoves
 
+
 """MAIN LOOP"""
 print "Tic Tac Toe\n"
 
@@ -142,9 +145,9 @@ while not valid:
     else:
         playerChar = playerChar.upper()  # Convert to upper
         if playerChar == "X":  # Player wants to play X
-            symbolDict = {0: " ", 1: "X", -1: "O"}
-        elif playerChar == "O":  # Player wants to play O
             symbolDict = {0: " ", 1: "O", -1: "X"}
+        elif playerChar == "O":  # Player wants to play O
+            symbolDict = {0: " ", 1: "X", -1: "O"}
         valid = True
 print "You have chosen to play", playerChar, "\n"
 
@@ -170,10 +173,11 @@ while not gameIsFinished(gameBoard)[0]:
 
     else:  # Player's move
         validPlayerMoves = getValidMovesFor(gameBoard)
-        print "Your Move. Valid moves are", validPlayerMoves
+
         # Get a valid move from the player
         enteredValidMove = False
         while not enteredValidMove:
+            print "Your Move. Valid moves are", validPlayerMoves
             position = input("Move? ")
             if not position in validPlayerMoves:
                 print "Invalid move entered."
@@ -187,9 +191,9 @@ while not gameIsFinished(gameBoard)[0]:
 # Game is over, evalute the result
 gameStatus = gameIsFinished(gameBoard)
 if gameStatus[1]:  # Agent wins
-    print "Agent wins"
+    print "Agent wins in", str(9 - len(getValidMovesFor(gameBoard))), "moves"
 elif gameStatus[1] is False:  # Player wins
-    print "You Win"
+    print "You won in", str(9 - len(getValidMovesFor(gameBoard))), "moves"
 else:  # None... Draw
     print "DRAW"
 
