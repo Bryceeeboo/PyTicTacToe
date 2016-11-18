@@ -2,6 +2,11 @@ import random
 import time
 # symbolDict will be set based on whether the player chooses X or O
 symbolDict = {}
+# Score counters
+aiScore = 0
+playerScore = 0
+drawScore = 0
+totalGames = 0
 
 
 def drawBoard(c):
@@ -133,69 +138,90 @@ def getValidMovesFor(c):
     return validNextMoves
 
 
+def playGame():
+    """
+    Plays the game from picking a piece to playing the game to updating score
+    """
+    global totalGames, aiScore, playerScore, drawScore, symbolDict
+    # Print stats
+    print "STATS:", totalGames, "total games"
+    print "AI   :", aiScore
+    print "You  :", playerScore
+    print "Draw :", drawScore
+    print ""
+
+    # Get an input from the player
+    valid = False
+    while not valid:
+        playerChar = raw_input("Play X or O? ")  # Ask user to pick play
+        if not playerChar.upper() in ["X", "O"]:
+            if playerChar.lower() == "exit":
+                exit()
+            print "Input is invalid, please pick X or O"
+        else:
+            playerChar = playerChar.upper()  # Convert to upper
+            if playerChar == "X":  # Player wants to play X
+                symbolDict = {0: " ", 1: "O", -1: "X"}
+            elif playerChar == "O":  # Player wants to play O
+                symbolDict = {0: " ", 1: "X", -1: "O"}
+            valid = True
+    print "You have chosen to play", playerChar, "\n"
+
+    # Pick who goes first
+    print "Picking who goes first..."
+    if round(random.random()) > 0:
+        print "Agent goes first"
+        agentsMove = True
+    else:
+        print "You go first"
+        agentsMove = False
+
+    # Play the game
+    gameBoard = [0, 0, 0, 0, 0, 0, 0, 0, 0]
+    while not gameIsFinished(gameBoard)[0]:
+
+        if agentsMove:  # Agent's move
+            # The agent's move
+            print "Agent Moving"
+            # PALCEHOLDER - PICK A RANDOM MOVE
+            gameBoard[random.choice(getValidMovesFor(gameBoard))-1] = 1
+            agentsMove = not agentsMove  # Alternate move
+
+        else:  # Player's move
+            validPlayerMoves = getValidMovesFor(gameBoard)
+
+            # Get a valid move from the player
+            enteredValidMove = False
+            while not enteredValidMove:
+                print "Your Move. Valid moves are", validPlayerMoves
+                position = input("Move? ")
+                if not position in validPlayerMoves:
+                    print "Invalid move entered."
+                else:
+                    enteredValidMove = True
+            gameBoard[position - 1] = -1  # Make the move for the player
+            agentsMove = not agentsMove  # Alternate move
+
+        drawBoard(gameBoard)  # Draw the board after every move
+
+    # Game is over, evalute the result
+    gameStatus = gameIsFinished(gameBoard)
+    if gameStatus[1]:  # Agent wins
+        print "AI wins in", str(9 - len(getValidMovesFor(gameBoard))), "moves"
+        aiScore += 1
+    elif gameStatus[1] is False:  # Player wins
+        print "You won in", str(9 - len(getValidMovesFor(gameBoard))), "moves"
+        playerScore += 1
+    else:  # None... Draw
+        print "DRAW"
+        drawScore += 1
+    totalGames += 1
+
 """MAIN LOOP"""
 print "Tic Tac Toe\n"
 
-# Get an input from the player
-valid = False
-while not valid:
-    playerChar = raw_input("Play X or O? ")  # Ask user to pick play
-    if not playerChar.upper() in ["X", "O"]:
-        print "Input is invalid, please pick X or O"
-    else:
-        playerChar = playerChar.upper()  # Convert to upper
-        if playerChar == "X":  # Player wants to play X
-            symbolDict = {0: " ", 1: "O", -1: "X"}
-        elif playerChar == "O":  # Player wants to play O
-            symbolDict = {0: " ", 1: "X", -1: "O"}
-        valid = True
-print "You have chosen to play", playerChar, "\n"
-
-# Pick who goes first
-print "Picking who goes first..."
-if round(random.random()) > 0:
-    print "Agent goes first"
-    agentsMove = True
-else:
-    print "You go first"
-    agentsMove = False
-
-# Play the game
-gameBoard = [0, 0, 0, 0, 0, 0, 0, 0, 0]
-while not gameIsFinished(gameBoard)[0]:
-
-    if agentsMove:  # Agent's move
-        # The agent's move
-        print "Agent Moving"
-        # PALCEHOLDER - PICK A RANDOM MOVE
-        gameBoard[random.choice(getValidMovesFor(gameBoard))-1] = 1
-        agentsMove = not agentsMove  # Alternate move
-
-    else:  # Player's move
-        validPlayerMoves = getValidMovesFor(gameBoard)
-
-        # Get a valid move from the player
-        enteredValidMove = False
-        while not enteredValidMove:
-            print "Your Move. Valid moves are", validPlayerMoves
-            position = input("Move? ")
-            if not position in validPlayerMoves:
-                print "Invalid move entered."
-            else:
-                enteredValidMove = True
-        gameBoard[position - 1] = -1  # Make the move for the player
-        agentsMove = not agentsMove  # Alternate move
-
-    drawBoard(gameBoard)  # Draw the board after every move
-
-# Game is over, evalute the result
-gameStatus = gameIsFinished(gameBoard)
-if gameStatus[1]:  # Agent wins
-    print "Agent wins in", str(9 - len(getValidMovesFor(gameBoard))), "moves"
-elif gameStatus[1] is False:  # Player wins
-    print "You won in", str(9 - len(getValidMovesFor(gameBoard))), "moves"
-else:  # None... Draw
-    print "DRAW"
+while True:
+    playGame()
 
 # Test cases
 # print gameIsFinished([0,0,0,0,0,0,0,0,0])
