@@ -1,3 +1,4 @@
+# Tic Tac Toe AI and game player.
 import random
 import time
 # symbolDict will be set based on whether the player chooses X or O
